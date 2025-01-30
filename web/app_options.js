@@ -75,7 +75,7 @@ const Type = {
 const defaultOptions = {
   allowedGlobalEvents: {
     /** @type {Object} */
-    value: null,
+    value: true,
     kind: OptionKind.BROWSER,
   },
   canvasMaxAreaInBytes: {
@@ -90,10 +90,7 @@ const defaultOptions = {
   },
   localeProperties: {
     /** @type {Object} */
-    value:
-      typeof PDFJSDev === "undefined" || PDFJSDev.test("GENERIC")
-        ? { lang: navigator.language || "en-US" }
-        : null,
+    value: { lang: navigator.language || "en-US" },
     kind: OptionKind.BROWSER,
   },
   nimbusDataStr: {
@@ -333,12 +330,7 @@ const defaultOptions = {
   cMapUrl: {
     /** @type {string} */
     value:
-      // eslint-disable-next-line no-nested-ternary
-      typeof PDFJSDev === "undefined"
-        ? "../external/bcmaps/"
-        : PDFJSDev.test("MOZCENTRAL")
-          ? "resource://pdf.js/web/cmaps/"
-          : "../web/cmaps/",
+      "/modules/spw-dtic-vieux-journaux-recherche-ui/javascript/viewer/pdfjs/cmaps/",
     kind: OptionKind.API,
   },
   disableAutoFetch: {
@@ -404,12 +396,7 @@ const defaultOptions = {
   standardFontDataUrl: {
     /** @type {string} */
     value:
-      // eslint-disable-next-line no-nested-ternary
-      typeof PDFJSDev === "undefined"
-        ? "../external/standard_fonts/"
-        : PDFJSDev.test("MOZCENTRAL")
-          ? "resource://pdf.js/web/standard_fonts/"
-          : "../web/standard_fonts/",
+      "/modules/spw-dtic-vieux-journaux-recherche-ui/javascript/viewer/pdfjs/standard_fonts/",
     kind: OptionKind.API,
   },
   useSystemFonts: {
@@ -434,9 +421,7 @@ const defaultOptions = {
   wasmUrl: {
     /** @type {string} */
     value:
-      typeof PDFJSDev !== "undefined" && PDFJSDev.test("MOZCENTRAL")
-        ? "resource://pdf.js/web/wasm/"
-        : "../web/wasm/",
+      "/modules/spw-dtic-vieux-journaux-recherche-ui/javascript/viewer/pdfjs/wasm/",
     kind: OptionKind.API,
   },
 
@@ -448,12 +433,7 @@ const defaultOptions = {
   workerSrc: {
     /** @type {string} */
     value:
-      // eslint-disable-next-line no-nested-ternary
-      typeof PDFJSDev === "undefined"
-        ? "../src/pdf.worker.js"
-        : PDFJSDev.test("MOZCENTRAL")
-          ? "resource://pdf.js/build/pdf.worker.mjs"
-          : "../build/pdf.worker.mjs",
+      "/modules/spw-dtic-vieux-journaux-recherche-ui/javascript/viewer/pdfjs/build/pdf.worker.js",
     kind: OptionKind.WORKER,
   },
 };
@@ -469,9 +449,7 @@ if (typeof PDFJSDev === "undefined" || !PDFJSDev.test("MOZCENTRAL")) {
   defaultOptions.sandboxBundleSrc = {
     /** @type {string} */
     value:
-      typeof PDFJSDev === "undefined"
-        ? "../build/dev-sandbox/pdf.sandbox.mjs"
-        : "../build/pdf.sandbox.mjs",
+      "/modules/spw-dtic-vieux-journaux-recherche-ui/javascript/viewer/pdfjs/build/pdf.sandbox.js",
     kind: OptionKind.VIEWER,
   };
   defaultOptions.viewerCssTheme = {

@@ -705,5 +705,20 @@ See https://github.com/adobe-type-tools/cmap-resources
 
     </div> <!-- outerContainer -->
     <div id="printContainer"></div>
+  <script>
+    // Block the "load" event until all pages are loaded, to ensure that printing
+    // works in Firefox; see https://bugzilla.mozilla.org/show_bug.cgi?id=1618553
+
+    document.blockUnblockOnload?.(true);
+
+    if (
+      document.readyState === "interactive" ||
+      document.readyState === "complete"
+    ) {
+      webViewerLoad();
+    } else {
+      document.addEventListener("DOMContentLoaded", webViewerLoad, true);
+    }
+  </script>
   </body>
 </html>

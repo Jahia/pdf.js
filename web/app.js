@@ -187,7 +187,7 @@ const PDFViewerApplication = {
   editorUndoBar: null,
 
   // Called once when the document is loaded.
-  async initialize(appConfig) {
+  async initialize(appConfig, onDocumentLoad) {
     this.appConfig = appConfig;
 
     // Ensure that `Preferences`, and indirectly `AppOptions`, have initialized
@@ -257,7 +257,7 @@ const PDFViewerApplication = {
 
     // Bind the various event handlers *after* the viewer has been
     // initialized, to prevent errors if an event arrives too soon.
-    this.bindEvents();
+    this.bindEvents(onDocumentLoad);
     this.bindWindowEvents();
 
     this._initializedCapability.settled = true;
@@ -379,14 +379,7 @@ const PDFViewerApplication = {
   async _initializeViewerComponents() {
     const { appConfig, externalServices, l10n } = this;
 
-    const eventBus =
-      typeof PDFJSDev !== "undefined" && PDFJSDev.test("MOZCENTRAL")
-        ? new FirefoxEventBus(
-            AppOptions.get("allowedGlobalEvents"),
-            externalServices,
-            AppOptions.get("isInAutomation")
-          )
-        : new EventBus();
+    const eventBus = new EventBus();
     this.eventBus = AppOptions.eventBus = eventBus;
     this.mlManager?.setEventBus(eventBus, this._globalAbortController.signal);
 
@@ -683,21 +676,11 @@ const PDFViewerApplication = {
     }
   },
 
-  async run(config) {
-    await this.initialize(config);
-
+  async run(config, file, onDocumentLoad) {
+    await this.initialize(config, onDocumentLoad);
+    console.log("PDFViewerApplication.run: config", config, this);
     const { appConfig, eventBus } = this;
-    let file;
-    if (typeof PDFJSDev === "undefined" || PDFJSDev.test("GENERIC")) {
-      const queryString = document.location.search.substring(1);
-      const params = parseQueryString(queryString);
-      file = params.get("file") ?? AppOptions.get("defaultUrl");
-      validateFileURL(file);
-    } else if (PDFJSDev.test("MOZCENTRAL")) {
-      file = window.location.href;
-    } else if (PDFJSDev.test("CHROME")) {
-      file = AppOptions.get("defaultUrl");
-    }
+    validateFileURL(file);
 
     if (typeof PDFJSDev === "undefined" || PDFJSDev.test("GENERIC")) {
       const fileInput = (this._openFileInput = document.createElement("input"));
@@ -763,19 +746,7 @@ const PDFViewerApplication = {
       appConfig.findBar?.toggleButton?.classList.add("hidden");
     }
 
-    if (typeof PDFJSDev === "undefined" || PDFJSDev.test("GENERIC")) {
-      if (file) {
-        this.open({ url: file });
-      } else {
-        this._hideViewBookmark();
-      }
-    } else if (PDFJSDev.test("MOZCENTRAL || CHROME")) {
-      this.setTitleUsingUrl(file, /* downloadUrl = */ file);
-
-      this.externalServices.initPassiveLoading();
-    } else {
-      throw new Error("Not implemented: run");
-    }
+    this.open({ url: file });
   },
 
   get externalServices() {
@@ -1896,7 +1867,7 @@ const PDFViewerApplication = {
     }
   },
 
-  bindEvents() {
+  bindEvents(onDocumentLoad) {
     if (this._eventBusAbortController) {
       return;
     }
@@ -1910,6 +1881,9 @@ const PDFViewerApplication = {
       pdfViewer,
       preferences,
     } = this;
+
+    // Add documentLoaded event to the _ready capability in viewer.js.
+    eventBus._on("documentloaded", onDocumentLoad, opts);
 
     eventBus._on("resize", onResize.bind(this), opts);
     eventBus._on("hashchange", onHashchange.bind(this), opts);
@@ -2070,6 +2044,7 @@ const PDFViewerApplication = {
         signal,
       });
     }
+
     addWindowResolutionChange();
 
     window.addEventListener("wheel", onWheel.bind(this), {

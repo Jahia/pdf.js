@@ -567,7 +567,7 @@ function createWebBundle(defines, options) {
   const viewerFileConfig = createWebpackConfig(
     defines,
     {
-      filename: "viewer.mjs",
+      filename: "viewer.js",
       library: {
         type: "module",
       },

@@ -74,10 +74,7 @@ function getViewerConfiguration() {
       toolbar: document.getElementById("secondaryToolbar"),
       toggleButton: document.getElementById("secondaryToolbarToggleButton"),
       presentationModeButton: document.getElementById("presentationMode"),
-      openFileButton:
-        typeof PDFJSDev === "undefined" || PDFJSDev.test("GENERIC")
-          ? document.getElementById("secondaryOpenFile")
-          : null,
+      openFileButton: null,
       printButton: document.getElementById("secondaryPrint"),
       downloadButton: document.getElementById("secondaryDownload"),
       viewBookmarkButton: document.getElementById("viewBookmark"),
@@ -232,7 +229,7 @@ function getViewerConfiguration() {
   };
 }
 
-function webViewerLoad() {
+function webViewerLoad({ url, onDocumentLoad }) {
   const config = getViewerConfiguration();
 
   if (typeof PDFJSDev !== "undefined" && PDFJSDev.test("GENERIC")) {
@@ -258,24 +255,12 @@ function webViewerLoad() {
       document.dispatchEvent(event);
     }
   }
-  PDFViewerApplication.run(config);
-}
-
-// Block the "load" event until all pages are loaded, to ensure that printing
-// works in Firefox; see https://bugzilla.mozilla.org/show_bug.cgi?id=1618553
-document.blockUnblockOnload?.(true);
-
-if (
-  document.readyState === "interactive" ||
-  document.readyState === "complete"
-) {
-  webViewerLoad();
-} else {
-  document.addEventListener("DOMContentLoaded", webViewerLoad, true);
+  PDFViewerApplication.run(config, url, onDocumentLoad);
 }
 
 export {
   PDFViewerApplication,
   AppConstants as PDFViewerApplicationConstants,
   AppOptions as PDFViewerApplicationOptions,
+  webViewerLoad,
 };
